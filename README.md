@@ -103,9 +103,6 @@ The output data is standardized to Darwin Core terms for biodiversity data publi
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Copyright
-
-Copyright (c) 2026 Antarctic Biodiversity Portal
 
 ## Project Background
 
