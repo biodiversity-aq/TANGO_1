@@ -39,7 +39,7 @@ events_clean <- events %>%
         ]
       )
     ),
-    maximumDistanceAboveSurfaceInMeters = round(maximumDistanceAboveSurfaceInMeters, 0),
+    minimumElevationInMeters = round(maximumDistanceAboveSurfaceInMeters, 0),
     # move habitat == Aerial to eventRemarks
     eventRemarks = case_when(
       habitat == "Aerial" & is.na(eventRemarks) ~
@@ -172,7 +172,8 @@ tango_1_event <- events_clean %>%
     footprintWKT,
     minimumDepthInMeters,
     maximumDepthInMeters,
-    maximumDistanceAboveSurfaceInMeters,
+    minimumElevationInMeters,
+    maximumElevationInMeters,
     recordedBy,
     recordedByID
   )
