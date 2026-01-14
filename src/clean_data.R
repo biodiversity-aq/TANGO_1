@@ -22,7 +22,7 @@ events_clean <- events %>%
   rename(
     parentEventID = parentEventId,
     eventID = eventId,
-    maximumDistanceAboveSurfaceInMeters = maxAltitudeM,
+    maximumElevationInMeters = maxAltitudeM,
     minimumDepthInMeters = minimumDepthM,
     maximumDepthInMeters = maximumDepthM
   ) %>%
@@ -39,7 +39,7 @@ events_clean <- events %>%
         ]
       )
     ),
-    minimumElevationInMeters = round(maximumDistanceAboveSurfaceInMeters, 0),
+    maximumElevationInMeters = round(maximumElevationInMeters, 0),
     # move habitat == Aerial to eventRemarks
     eventRemarks = case_when(
       habitat == "Aerial" & is.na(eventRemarks) ~
@@ -62,7 +62,6 @@ events_clean <- events %>%
       c(latitudeStart, longitudeStart, latitudeEnd, longitudeEnd),
       ~ na_if(.x, 0)
     ),
-    # Round coordinates to 4 decimal places (~11m precision)
     latitudeStart = round(latitudeStart, 4),
     longitudeStart = round(longitudeStart, 4),
     latitudeEnd = round(latitudeEnd, 4),
@@ -172,7 +171,6 @@ tango_1_event <- events_clean %>%
     footprintWKT,
     minimumDepthInMeters,
     maximumDepthInMeters,
-    minimumElevationInMeters,
     maximumElevationInMeters,
     recordedBy,
     recordedByID
