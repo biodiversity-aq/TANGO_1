@@ -216,8 +216,8 @@ non_unique_samples <- samples_clean %>% add_count(sampleID) %>% filter(n > 1)
   
 
 # save cleaned events
-write_tsv(events_clean, here("data", "03_output", "tango_1_events.tsv"))
-write_tsv(samples_clean, here("data", "03_output", "tango_1_samples.tsv"))
+write_tsv(events_clean, here("data", "03_output", "tango_1_events.tsv"), na = "")
+write_tsv(samples_clean, here("data", "03_output", "tango_1_samples.tsv"), na = "")
 
 
 
