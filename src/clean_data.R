@@ -5,6 +5,7 @@ library(janitor)
 library(lubridate)
 library(readxl)
 library(tidyverse)
+library(jsonlite)
 
 # load data
 events <- read_excel(here("data", "02_interim", "TANGO_1_DATA_cleaned.xlsx"), sheet = "Events") %>%
@@ -13,7 +14,7 @@ events <- read_excel(here("data", "02_interim", "TANGO_1_DATA_cleaned.xlsx"), sh
 
 gear_protocol <- read_tsv(here("data", "01_raw", "gear_protocol.tsv")) 
 
-samples <-  read_excel(here("data", "02_interim", "TANGO_1_DATA_cleaned.xlsx"), sheet = "Samples") %>%
+samples <-  read_excel(here("data", "02_interim", "TANGO_1_DATA_cleaned.xlsx"), sheet = "Samples", col_types = "text") %>%
   clean_names(case = "lower_camel") %>%
   select(!where(~ all(is.na(.))))  # remove empty columns
 
@@ -152,7 +153,11 @@ events_clean <- events %>%
     ),
     recordedByID = if_else(recordedByID == "", NA_character_, recordedByID)
   ) %>%
-  ungroup() 
+  ungroup() %>%
+  add_row(
+    eventID = "https://www.wikidata.org/entity/Q119843670",
+    eventDate = "2023-02-13/2023-03-19"
+  )
   
   
 tango_1_event <- events_clean %>%  
@@ -214,10 +219,50 @@ samples_clean <- samples %>%
 # check for non-unique sampleIDs
 non_unique_samples <- samples_clean %>% add_count(sampleID) %>% filter(n > 1) 
   
+# occurrences
+occ <- samples_clean %>%
+  filter(!is.na(scientificName),
+         eventIDinEvents == TRUE) %>%
+  rename(organismQuantity = individualCount) %>%
+  mutate(
+    occurrenceStatus = "detected",
+    materialEntityType = sampleType,
+    basisOfRecord = if_else(
+      sampleType %in% c("Individual", "Individuals"),
+      "PreservedSpecimen",
+      "MaterialEntity"
+    ),
+    occurrenceID = paste(
+      "TANGO_1",
+      eventID,
+      sampleID,
+      replace_na(sampleType, "unknown"),
+      replace_na(parameter, "unknown"),
+      replace_na(preparations, "unknown"),
+      sep = "_"
+    )
+  ) %>%
+  rowwise() %>%
+  mutate(
+    dynamicProperties = toJSON(
+      list(
+        sampleID = sampleID,
+        parentSampleID = parentSampleID,
+        parameter = parameter
+      ),
+      auto_unbox = TRUE,
+      na = "null"
+    )
+  ) %>%
+  ungroup() %>%
+  # occurrenceID as 1st column
+  relocate(occurrenceID, .before = 1)
+
 
 # save cleaned events
-write_tsv(events_clean, here("data", "03_output", "tango_1_events.tsv"), na = "")
-write_tsv(samples_clean, here("data", "03_output", "tango_1_samples.tsv"), na = "")
+write_tsv(events_clean, here("data", "03_output", "tango_1_events.txt"), na = "")
+write_tsv(samples_clean, here("data", "03_output", "tango_1_samples.txt"), na = "")
+write_tsv(occ, here("data", "03_output", "tango_1_occurrence.txt"), na = "")
 
 
 

@@ -98,6 +98,14 @@ scientificName | verbatimIdentification
 - vernacularName: extracted from scientificName
 - taxon fields: scientificName based on WoRMS, scientificNameAuthorship, kingdom, phylum, class, order, family, genus, specificEpithet.
 
+### remove duplicate
+
+SCUBA_11 sampleID 563 for stable isotopes, Dried, duplicated, exact same info -> delete 1 row
+
+### change sampleID
+
+sampleID 247 is used for 1 individual and Bulk, change the bulk's sampleID to 247_bulk
+
 ## fix eventID typo
 
 old eventID | new eventID
